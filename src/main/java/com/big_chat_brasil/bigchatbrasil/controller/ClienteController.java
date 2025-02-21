@@ -36,12 +36,6 @@ public class ClienteController {
         return clientService.consultClient(id);
     }
 
-    // @PutMapping("/limit/{id}")
-    // public Client alterLimit(@PathVariable Long id, @RequestBody BigDecimal newLimit) {
-    //     System.out.println("New limit: " + newLimit);
-    //     return clientService.alterCreditLimit(id, newLimit);
-    // }
-
     @PutMapping("/limit/{id}")
     public Client alterLimit(@PathVariable Long id, @RequestBody String json) throws IOException {
         // Create a instace of ObjectMapper
