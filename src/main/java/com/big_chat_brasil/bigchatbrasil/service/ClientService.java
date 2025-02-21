@@ -13,14 +13,14 @@ public class ClientService {
     @Autowired
     private ClientRepository ClientRepository;
 
-    public List<Client> getClients() {
-        return ClientRepository.findAll(); 
-    }
-
     public Client registerClient(Client Client) {
         return ClientRepository.save(Client);
     }
 
+    public List<Client> getClients() {
+        return ClientRepository.findAll(); 
+    }
+    
     public Client consultClient(Long id) {
         return ClientRepository.findById(id).orElseThrow(() -> new RuntimeException("Client not found"));
     }
@@ -31,9 +31,9 @@ public class ClientService {
         return ClientRepository.save(Client);
     }
 
-    public Client addCredit(Long id, BigDecimal value) {
+    public Client addCredit(Long id, BigDecimal newBalanceCredit) {
         Client Client = consultClient(id);
-        Client.setBalanceCredit(Client.getBalanceCredit().add(value));
+        Client.setBalanceCredit(Client.getBalanceCredit().add(newBalanceCredit));
         return ClientRepository.save(Client);
     }
 }

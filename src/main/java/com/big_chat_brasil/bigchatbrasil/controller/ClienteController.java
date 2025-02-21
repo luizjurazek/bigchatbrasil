@@ -8,6 +8,12 @@ import org.springframework.web.bind.annotation.*;
 import java.math.BigDecimal;
 import java.util.List;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import java.io.IOException;
+
+import com.big_chat_brasil.bigchatbrasil.dto.AlterClientLimitDTO;
+import com.big_chat_brasil.bigchatbrasil.dto.AddClientCreditDTO;
+
 
 @RestController
 @RequestMapping("/clients")
@@ -30,13 +36,37 @@ public class ClienteController {
         return clientService.consultClient(id);
     }
 
-    @PutMapping("/limite/{id}")
-    public Client alterLimit(@PathVariable Long id, @RequestBody BigDecimal newLimit) {
+    // @PutMapping("/limit/{id}")
+    // public Client alterLimit(@PathVariable Long id, @RequestBody BigDecimal newLimit) {
+    //     System.out.println("New limit: " + newLimit);
+    //     return clientService.alterCreditLimit(id, newLimit);
+    // }
+
+    @PutMapping("/limit/{id}")
+    public Client alterLimit(@PathVariable Long id, @RequestBody String json) throws IOException {
+        // Create a instace of ObjectMapper
+        ObjectMapper objectMapper = new ObjectMapper();
+        
+        // Deserialize JSON for DTO AlterClientLimit
+        AlterClientLimitDTO limitRequest = objectMapper.readValue(json, AlterClientLimitDTO.class);
+        
+        // Acess the new limit
+        BigDecimal newLimit = limitRequest.getNewLimit();
+        
         return clientService.alterCreditLimit(id, newLimit);
     }
 
-    @PutMapping("/credito/{id}")
-    public Client addCredit(@PathVariable Long id, @RequestBody BigDecimal value) {
-        return clientService.addCredit(id, value);
+    @PutMapping("/credit/{id}")
+    public Client addCredit(@PathVariable Long id, @RequestBody String json) throws IOException {
+        // Create a instace of ObjectMapper
+        ObjectMapper objectMapper = new ObjectMapper();
+        
+        // Deserialize JSON for DTO AlterClientLimit
+        AddClientCreditDTO addCreditRequest = objectMapper.readValue(json, AddClientCreditDTO.class);
+        
+        // Acess the new limit
+        BigDecimal newBalanceCredit = addCreditRequest.getNewBalanceCredit();
+
+        return clientService.addCredit(id, newBalanceCredit);
     }
 }

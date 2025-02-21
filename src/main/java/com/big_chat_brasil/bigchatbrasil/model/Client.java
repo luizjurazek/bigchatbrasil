@@ -6,6 +6,9 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import java.math.BigDecimal;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.big_chat_brasil.bigchatbrasil.utils.BigDecimalDeserializer;
+
 @Entity
 public class Client {
     @Id
@@ -17,8 +20,10 @@ public class Client {
     private String cpf;
     private String cnpj;
     private String companyName;
+    @JsonDeserialize(using = BigDecimalDeserializer.class)
     private BigDecimal balanceCredit;
     private planType plan; // "PRE_PAGO" ou "POS_PAGO"
+    @JsonDeserialize(using = BigDecimalDeserializer.class)
     private BigDecimal creditLimit;
 
     // Getters e Setters
