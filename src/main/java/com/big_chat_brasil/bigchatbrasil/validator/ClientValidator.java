@@ -29,6 +29,8 @@ public class ClientValidator {
         if (emailAlreadyInUse != null) {
             errors.add(new ErrorResponse("email", "Email already in use"));
         }
+        // Verificar se os padroes estão corretos
+
         if (cpfAlreadyInUse != null) {
             errors.add(new ErrorResponse("cpf", "CPF already in use"));
         }

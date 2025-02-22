@@ -59,8 +59,8 @@ public class ClienteController {
     @GetMapping("/{clientId}")
     public Client consultClient(
         @Parameter(description = "The ID of the client to be retrieved", required = true)
-        @PathVariable Long id) {
-        return clientService.consultClient(id);
+        @PathVariable Long clientId) {
+        return clientService.consultClient(clientId);
     }
 
     @Operation(
@@ -70,13 +70,13 @@ public class ClienteController {
     @PutMapping("/update-limit/{clientId}")
     public Client alterLimit(
         @Parameter(description = "The ID of the client whose credit limit will be updated", required = true)
-        @PathVariable Long id,
+        @PathVariable Long clientId,
 
         @Parameter(description = "Object containing the new credit limit", required = true)
         @RequestBody AlterClientLimitDTO limitRequest) {
         
         BigDecimal newLimit = limitRequest.getNewLimit();
-        return clientService.alterCreditLimit(id, newLimit);
+        return clientService.alterCreditLimit(clientId, newLimit);
     }
 
     @Operation(
@@ -86,13 +86,13 @@ public class ClienteController {
     @PutMapping("/add-credit-limit/{clientId}")
     public Client addCredit(
         @Parameter(description = "The ID of the client to whom credit will be added", required = true)
-        @PathVariable Long id,
+        @PathVariable Long clientId,
 
         @Parameter(description = "Object containing the new credit balance to be added", required = true)
         @RequestBody AddClientCreditDTO creditRequest) {
         
         BigDecimal newBalanceCredit = creditRequest.getNewBalanceCredit();
-        return clientService.addCredit(id, newBalanceCredit);
+        return clientService.addCredit(clientId, newBalanceCredit);
     }
 
     @Operation(
@@ -102,9 +102,9 @@ public class ClienteController {
     @GetMapping("/credit-balance/{clientId}")
     public ClientBalanceDTO consultClientBalance(
         @Parameter(description = "The ID of the client whose credit balance is being queried", required = true)
-        @PathVariable Long id) {
+        @PathVariable Long clientId) {
         
-        Client client = clientService.consultClient(id);
+        Client client = clientService.consultClient(clientId);
         BigDecimal availableBalance = client.getCreditLimit().subtract(client.getUsedCredit());
 
         return new ClientBalanceDTO(client.getId(), availableBalance, client.getUsedCredit(), client.getCreditLimit());
