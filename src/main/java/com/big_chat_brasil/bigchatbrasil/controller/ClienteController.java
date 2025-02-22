@@ -10,6 +10,10 @@ import java.math.BigDecimal;
 import java.util.List;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
 import java.io.IOException;
 
 import com.big_chat_brasil.bigchatbrasil.dto.AlterClientLimitDTO;
@@ -21,6 +25,7 @@ import com.big_chat_brasil.bigchatbrasil.dto.AlterPlanTypeDTO;
 
 @RestController
 @RequestMapping("/clients")
+@Tag(name = "Clients", description = "Endpoints to manage clients")
 public class ClienteController {
     @Autowired
     private ClientService clientService;
@@ -41,30 +46,36 @@ public class ClienteController {
     }
 
     @PutMapping("/limit/{id}")
-    public Client alterLimit(@PathVariable Long id, @RequestBody String json) throws IOException {
-        // Create a instace of ObjectMapper
-        ObjectMapper objectMapper = new ObjectMapper();
+    public Client alterLimit(
+        @Parameter(description = "The ID of the client to which the credit limit will be set") 
+        @PathVariable Long id, 
+
+        @Parameter(description = "Object containing the new credit limit to be set", required = true) 
+        @RequestBody AlterClientLimitDTO limitRequest) {  // Alterando para o DTO diretamente
         
-        // Deserialize JSON for DTO AlterClientLimit
-        AlterClientLimitDTO limitRequest = objectMapper.readValue(json, AlterClientLimitDTO.class);
-        
-        // Acess the new limit
         BigDecimal newLimit = limitRequest.getNewLimit();
         
         return clientService.alterCreditLimit(id, newLimit);
-    }
+}
+
 
     @PutMapping("/credit/{id}")
-    public Client addCredit(@PathVariable Long id, @RequestBody String payload) throws IOException {
-        ObjectMapper objectMapper = new ObjectMapper();
-        AddClientCreditDTO addCreditRequest = objectMapper.readValue(payload, AddClientCreditDTO.class);
-        BigDecimal newBalanceCredit = addCreditRequest.getNewBalanceCredit();
-
+    public Client addCredit(
+        @Parameter(description = "The ID of the client to which the credit will be added") 
+        @PathVariable Long id, 
+        
+        @Parameter(description = "Object containing the new credit balance to be added", required = true) 
+        @RequestBody AddClientCreditDTO creditRequest) throws IOException {
+        
+        BigDecimal newBalanceCredit = creditRequest.getNewBalanceCredit();
         return clientService.addCredit(id, newBalanceCredit);
     }
 
     @GetMapping("/credit/balance/{id}")
-    public ClientBalanceDTO consultClientBalance(@PathVariable Long id) {
+    public ClientBalanceDTO consultClientBalance(
+        @Parameter(description = "The ID of the client whose credit balance is being queried") 
+        @PathVariable Long id) {
+        
         Client client = clientService.consultClient(id);
         BigDecimal availableBalance = client.getCreditLimit().subtract(client.getUsedCredit());
 
@@ -72,11 +83,14 @@ public class ClienteController {
     }
 
     @PutMapping("/alter-plan-type/{clientId}")
-    public Client alterPlanType(@PathVariable Long clientId, @RequestBody String payload) throws IOException {
-        ObjectMapper objectMapper = new ObjectMapper();
-        AlterPlanTypeDTO alterPlanTypeDTO = objectMapper.readValue(payload, AlterPlanTypeDTO.class);
-        planType newPlanType = alterPlanTypeDTO.getNewPlanType();
-
+    public Client alterPlanType(
+        @Parameter(description = "The ID of the client whose plan type will be updated") 
+        @PathVariable Long clientId, 
+        
+        @Parameter(description = "Object containing the new plan type for the client", required = true) 
+        @RequestBody AlterPlanTypeDTO payload) throws IOException { 
+        
+        planType newPlanType = payload.getNewPlanType();
         return clientService.alterPlan(clientId, newPlanType);
     }
 }
