@@ -68,7 +68,7 @@ public class ClienteController {
         Client client = clientService.consultClient(id);
         BigDecimal availableBalance = client.getCreditLimit().subtract(client.getUsedCredit());
 
-        return new ClientBalanceDTO(client.getId(), availableBalance);
+        return new ClientBalanceDTO(client.getId(), availableBalance, client.getUsedCredit(), client.getCreditLimit());
     }
 
     @PutMapping("/alter-plan-type/{clientId}")
