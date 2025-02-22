@@ -6,10 +6,11 @@ import com.big_chat_brasil.bigchatbrasil.repository.ClientRepository;
 import com.big_chat_brasil.bigchatbrasil.repository.SMSRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.math.BigDecimal;
 import java.util.List;
-import com.big_chat_brasil.bigchatbrasil.model.planType;
 
 @Service
 public class SMSService {
@@ -25,22 +26,18 @@ public class SMSService {
     // Method to send a message
     public SMS sendMessage(SMS sms) {
         Client client = clientRepository.findById(sms.getClientId()).orElseThrow(() -> new RuntimeException("Client not found"));
-        
-        // Verificação de saldo para clientes pre-pago
-        // Colocar o valor em uma variavel 
-        if (client.getPlan().equals(planType.PRE_PAGO) && client.getBalanceCredit().compareTo(costPerMessage) >= 0) {
-            client.setBalanceCredit(client.getBalanceCredit().subtract(costPerMessage));
-            clientRepository.save(client);
-        } else if (client.getPlan().equals(planType.POS_PAGO)) {
-            // Registrar o consumo no limite de crédito
-            if (client.getCreditLimit().compareTo(costPerMessage) >= 0) {
-                client.setCreditLimit(client.getCreditLimit().subtract(costPerMessage));
-                clientRepository.save(client);
-            } else {
-                throw new RuntimeException("Credit limit exceeded");
-            }
+
+        // Both type of plan use CreditLimit to check if the user has enough balance
+        // if plan is pre-pago, the creditLimit is the value alocated to use
+        // if plan is pos-pago, the creditLimit is the max value that the user can use
+        boolean hasBalance = client.getCreditLimit().subtract(client.getUsedCredit()).compareTo(costPerMessage) < 0;
+
+        if (hasBalance) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User doesn't have enough balance");
         }
-        
+    
+        client.setUsedCredit(client.getUsedCredit().add(costPerMessage));
+        clientRepository.save(client);
         return smsRepository.save(sms);
     }
 
@@ -51,12 +48,12 @@ public class SMSService {
 
     // Method to check a message by id
     public SMS getMessageById(Long smsId) {
-        return smsRepository.findById(smsId).orElseThrow(() -> new RuntimeException("Message not found"));
+        return smsRepository.findById(smsId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Message not found"));
     }
 
     // Método para excluir uma mensagem
     public SMS deleteMessage(Long smsId) {
-        SMS sms = smsRepository.findById(smsId).orElseThrow(() -> new RuntimeException("Message not found"));
+        SMS sms = smsRepository.findById(smsId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Message not found"));
         smsRepository.delete(sms);
         return sms;
     }

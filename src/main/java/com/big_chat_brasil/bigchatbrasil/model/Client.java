@@ -20,9 +20,9 @@ public class Client {
     private String cpf;
     private String cnpj;
     private String companyName;
+    private planType plan; // "PRE_PAGO" or "POS_PAGO"
     @JsonDeserialize(using = BigDecimalDeserializer.class)
-    private BigDecimal balanceCredit;
-    private planType plan; // "PRE_PAGO" ou "POS_PAGO"
+    private BigDecimal usedCredit;
     @JsonDeserialize(using = BigDecimalDeserializer.class)
     private BigDecimal creditLimit;
 
@@ -84,12 +84,12 @@ public class Client {
         this.companyName = companyName;
     }
 
-    public BigDecimal getBalanceCredit() {
-        return balanceCredit;
+    public BigDecimal getUsedCredit() {
+        return usedCredit;
     }
 
-    public void setBalanceCredit(BigDecimal balanceCredit) {
-        this.balanceCredit = balanceCredit;
+    public void setUsedCredit(BigDecimal usedCredit) {
+        this.usedCredit = usedCredit;
     }
 
     public planType getPlan() {

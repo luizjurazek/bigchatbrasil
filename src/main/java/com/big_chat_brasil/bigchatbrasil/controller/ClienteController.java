@@ -1,6 +1,7 @@
 package com.big_chat_brasil.bigchatbrasil.controller;
 
 import com.big_chat_brasil.bigchatbrasil.model.Client;
+import com.big_chat_brasil.bigchatbrasil.model.planType;
 import com.big_chat_brasil.bigchatbrasil.service.ClientService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -12,7 +13,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 
 import com.big_chat_brasil.bigchatbrasil.dto.AlterClientLimitDTO;
+import com.big_chat_brasil.bigchatbrasil.dto.ClientBalanceDTO;
 import com.big_chat_brasil.bigchatbrasil.dto.AddClientCreditDTO;
+import com.big_chat_brasil.bigchatbrasil.dto.AlterPlanTypeDTO;
+
 
 
 @RestController
@@ -51,16 +55,28 @@ public class ClienteController {
     }
 
     @PutMapping("/credit/{id}")
-    public Client addCredit(@PathVariable Long id, @RequestBody String json) throws IOException {
-        // Create a instace of ObjectMapper
+    public Client addCredit(@PathVariable Long id, @RequestBody String payload) throws IOException {
         ObjectMapper objectMapper = new ObjectMapper();
-        
-        // Deserialize JSON for DTO AlterClientLimit
-        AddClientCreditDTO addCreditRequest = objectMapper.readValue(json, AddClientCreditDTO.class);
-        
-        // Acess the new limit
+        AddClientCreditDTO addCreditRequest = objectMapper.readValue(payload, AddClientCreditDTO.class);
         BigDecimal newBalanceCredit = addCreditRequest.getNewBalanceCredit();
 
         return clientService.addCredit(id, newBalanceCredit);
+    }
+
+    @GetMapping("/credit/balance/{id}")
+    public ClientBalanceDTO consultClientBalance(@PathVariable Long id) {
+        Client client = clientService.consultClient(id);
+        BigDecimal availableBalance = client.getCreditLimit().subtract(client.getUsedCredit());
+
+        return new ClientBalanceDTO(client.getId(), availableBalance);
+    }
+
+    @PutMapping("/alter-plan-type/{clientId}")
+    public Client alterPlanType(@PathVariable Long clientId, @RequestBody String payload) throws IOException {
+        ObjectMapper objectMapper = new ObjectMapper();
+        AlterPlanTypeDTO alterPlanTypeDTO = objectMapper.readValue(payload, AlterPlanTypeDTO.class);
+        planType newPlanType = alterPlanTypeDTO.getNewPlanType();
+
+        return clientService.alterPlan(clientId, newPlanType);
     }
 }
