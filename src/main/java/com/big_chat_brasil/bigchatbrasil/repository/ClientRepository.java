@@ -8,4 +8,6 @@ import com.big_chat_brasil.bigchatbrasil.model.Client;
 public interface ClientRepository extends JpaRepository<Client, Long> {
     Client findByEmail(String email);
     Client findByCnpj(String cnpj);
+    Client findByCpf(String cpf);
+    Client findByPhone(String phone);
 }
