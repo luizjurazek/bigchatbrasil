@@ -5,6 +5,7 @@ import com.big_chat_brasil.bigchatbrasil.model.planType;
 import com.big_chat_brasil.bigchatbrasil.service.ClientService;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
@@ -26,14 +27,17 @@ import com.big_chat_brasil.bigchatbrasil.dto.AlterPlanTypeDTO;
 public class ClienteController {
     
     @Autowired
-    private ClientService clientService;
+    private final ClientService clientService;
+    public ClienteController(ClientService clientService) {
+        this.clientService = clientService;
+    }
 
     @Operation(
         summary = "Register a new client",
         description = "This endpoint registers a new client by providing all necessary details like name, contact, etc."
     )
     @PostMapping("/register")
-    public Client registerClient(
+    public ResponseEntity<?> registerClient(
         @Parameter(description = "Client object containing the client's information", required = true)
         @RequestBody Client client) {
         return clientService.registerClient(client);

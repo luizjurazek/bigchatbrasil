@@ -7,9 +7,9 @@ import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.context.annotation.ComponentScan;
 
 @SpringBootApplication
-@EnableJpaRepositories("com.big_chat_brasil.bigchatbrasil.*")
-@ComponentScan(basePackages = { "com.big_chat_brasil.bigchatbrasil.*" })
-@EntityScan("com.big_chat_brasil.bigchatbrasil.*")   
+@EnableJpaRepositories("com.big_chat_brasil.bigchatbrasil.repository")
+@ComponentScan("com.big_chat_brasil.bigchatbrasil")
+@EntityScan("com.big_chat_brasil.bigchatbrasil.model")
 
 public class BigchatbrasilApplication {
     public static void main(String[] args) {

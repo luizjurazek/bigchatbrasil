@@ -3,9 +3,13 @@ package com.big_chat_brasil.bigchatbrasil.service;
 import com.big_chat_brasil.bigchatbrasil.model.Client;
 import com.big_chat_brasil.bigchatbrasil.model.planType;
 import com.big_chat_brasil.bigchatbrasil.repository.ClientRepository;
+import com.big_chat_brasil.bigchatbrasil.validator.ClientValidator;
+import com.big_chat_brasil.bigchatbrasil.dto.ErrorResponse;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.math.BigDecimal;
@@ -14,30 +18,46 @@ import java.util.List;
 @Service
 public class ClientService {
     @Autowired
-    private ClientRepository ClientRepository;
+    private final ClientRepository clientRepository;
+    private final ClientValidator clientValidator;
 
-    public Client registerClient(Client Client) {
-        return ClientRepository.save(Client);
+    public ClientService(ClientRepository clientRepository, ClientValidator clientValidator) {
+        this.clientRepository = clientRepository;
+        this.clientValidator = clientValidator;
+    }
+
+    public ResponseEntity<?> registerClient(Client client) {
+        // Valida as informações do cliente
+        List<ErrorResponse> errors = clientValidator.validate(client);
+
+        if (!errors.isEmpty()) {
+            // Retorna erros se existirem
+            return ResponseEntity.badRequest().body(errors);
+        }
+
+        // Caso não haja erros, salva o cliente
+        Client savedClient = clientRepository.save(client);
+        return ResponseEntity.ok(savedClient);
     }
 
     public List<Client> getClients() {
-        return ClientRepository.findAll(); 
+        return clientRepository.findAll(); 
     }
     
     public Client consultClient(Long id) {
-        return ClientRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Client not found"));
+        return clientRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Client not found"));
     }
 
     public Client alterCreditLimit(Long id, BigDecimal newLimit) {
         Client Client = consultClient(id);
         Client.setCreditLimit(newLimit);
-        return ClientRepository.save(Client);
+        return clientRepository.save(Client);
     }
 
     public Client addCredit(Long id, BigDecimal newCreditLimit) {
         Client Client = consultClient(id);
         Client.setCreditLimit(Client.getCreditLimit().add(newCreditLimit));
-        return ClientRepository.save(Client);
+        return clientRepository.save(Client);
     }
 
     public Client alterPlan(Long id, planType newPlanType) {
@@ -46,6 +66,6 @@ public class ClientService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The new plan is the same as the current plan");        
         }
         Client.setPlan(newPlanType);
-        return ClientRepository.save(Client);
+        return clientRepository.save(Client);
     }
 }
