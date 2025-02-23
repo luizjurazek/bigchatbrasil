@@ -43,7 +43,7 @@ public class SMSService {
 
     // Method to list all messages
     public List<SMS> getAllMessages() {
-        return smsRepository.findAll();
+        return smsRepository.findAllByOrderByIdDesc();
     }
 
     // Method to check a message by id
@@ -60,7 +60,7 @@ public class SMSService {
 
     // Method to list messages by client
     public List<SMS> getMessageByClient(Long clientId) {
-        return smsRepository.findByClientId(clientId);
+        return smsRepository.findByClientIdOrderByIdDesc(clientId);
     }    
 }
 

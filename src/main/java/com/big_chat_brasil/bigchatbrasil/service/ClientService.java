@@ -41,7 +41,7 @@ public class ClientService {
     }
 
     public List<Client> getClients() {
-        return clientRepository.findAll(); 
+        return clientRepository.findAllByOrderByIdDesc(); 
     }
     
     public Client consultClient(Long id) {
