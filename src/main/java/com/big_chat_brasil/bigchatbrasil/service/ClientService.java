@@ -50,12 +50,18 @@ public class ClientService {
 
     public Client alterCreditLimit(Long id, BigDecimal newLimit) {
         Client Client = consultClient(id);
+        if(Client.getPlan().equals(planType.PRE_PAGO)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The client's plan does not allow credit limit increase");
+        }
         Client.setCreditLimit(newLimit);
         return clientRepository.save(Client);
     }
 
     public Client addCredit(Long id, BigDecimal newCreditLimit) {
         Client Client = consultClient(id);
+        if(Client.getPlan().equals(planType.POS_PAGO)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The client's plan does not allow credit limit increase");
+        }
         Client.setCreditLimit(Client.getCreditLimit().add(newCreditLimit));
         return clientRepository.save(Client);
     }
