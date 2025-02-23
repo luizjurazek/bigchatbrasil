@@ -25,7 +25,7 @@ public class SMSService {
 
     // Method to send a message
     public SMS sendMessage(SMS sms) {
-        Client client = clientRepository.findById(sms.getClientId()).orElseThrow(() -> new RuntimeException("Client not found"));
+        Client client = clientRepository.findById(sms.getClientId()).orElseThrow(() -> new  ResponseStatusException(HttpStatus.NOT_FOUND, "Client not found"));
 
         // Both type of plan use CreditLimit to check if the user has enough balance
         // if plan is pre-pago, the creditLimit is the value alocated to use
