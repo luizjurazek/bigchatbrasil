@@ -4,7 +4,10 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
+import jakarta.persistence.OneToMany;
+import com.fasterxml.jackson.annotation.JsonManagedReference; 
 import java.math.BigDecimal;
+import java.util.List; 
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.big_chat_brasil.bigchatbrasil.utils.BigDecimalDeserializer;
@@ -50,7 +53,18 @@ public class Client {
     @Schema(description = "Credit limit available for the client", example = "500.00", required = false)
     private BigDecimal creditLimit;
 
+    @OneToMany(mappedBy = "client")
+    @JsonManagedReference
+    private List<SMS> messages;
+
     // Getters and Setters
+    public List<SMS> getMessages() {
+        return messages;
+    }
+
+    public void setMessages(List<SMS> messages) {
+        this.messages = messages;
+    }
 
     public Long getId() {
         return id;

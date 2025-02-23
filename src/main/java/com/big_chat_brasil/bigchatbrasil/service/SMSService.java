@@ -25,7 +25,7 @@ public class SMSService {
 
     // Method to send a message
     public SMS sendMessage(SMS sms) {
-        Client client = clientRepository.findById(sms.getClientId()).orElseThrow(() -> new  ResponseStatusException(HttpStatus.NOT_FOUND, "Client not found"));
+        Client client = clientRepository.findById(sms.getClient().getId()).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Client not found"));
 
         // Both type of plan use CreditLimit to check if the user has enough balance
         // if plan is pre-pago, the creditLimit is the value alocated to use
@@ -35,9 +35,11 @@ public class SMSService {
         if (hasBalance) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User doesn't have enough balance");
         }
-    
+
         client.setUsedCredit(client.getUsedCredit().add(costPerMessage));
         clientRepository.save(client);
+        sms.setClient(client);
+
         return smsRepository.save(sms);
     }
 
@@ -51,7 +53,7 @@ public class SMSService {
         return smsRepository.findById(smsId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Message not found"));
     }
 
-    // Método para excluir uma mensagem
+    // Method to delete a message
     public SMS deleteMessage(Long smsId) {
         SMS sms = smsRepository.findById(smsId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Message not found"));
         smsRepository.delete(sms);
@@ -60,7 +62,8 @@ public class SMSService {
 
     // Method to list messages by client
     public List<SMS> getMessageByClient(Long clientId) {
-        return smsRepository.findByClientIdOrderByIdDesc(clientId);
+        Client client = clientRepository.findById(clientId).orElseThrow(() -> new  ResponseStatusException(HttpStatus.NOT_FOUND, "Client not found"));
+        return smsRepository.findByClientOrderByIdDesc(client);
     }    
 }
 

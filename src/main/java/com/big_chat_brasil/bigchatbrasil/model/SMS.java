@@ -4,7 +4,10 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.JoinColumn;
 import io.swagger.v3.oas.annotations.media.Schema;
+import com.fasterxml.jackson.annotation.JsonBackReference; 
 
 @Entity
 public class SMS {
@@ -23,11 +26,12 @@ public class SMS {
     @Schema(description = "The content of the SMS message", example = "Your verification code is 123456")
     private String message;
 
-    @Schema(description = "The ID of the client associated with this SMS", example = "101")
-    private Long clientId;
+    @ManyToOne
+    @JsonBackReference
+    @JoinColumn(name = "client_id", referencedColumnName = "id") 
+    private Client client;  // Renomeado para 'client' para refletir a relação correta
 
     // Getters e Setters
-
     public Long getId() {
         return id;
     }
@@ -60,11 +64,12 @@ public class SMS {
         this.message = message;
     }
 
-    public Long getClientId() {
-        return clientId;
+    public Client getClient() {  // Alterado para usar 'client' em vez de 'clientId'
+        return client;
     }
 
-    public void setClientId(Long clienteId) {
-        this.clientId = clienteId;
+    public void setClient(Client client) {
+        this.client = client;
     }
 }
+
